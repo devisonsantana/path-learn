@@ -5,7 +5,6 @@ export function Slider({ people, index, setIndex }) {
   return (
     <div className="section-center">
       {people.map((person, personIndex) => {
-        const { id, image, name, quote, title } = person;
         let position = "nextSlide";
         if (personIndex === index) {
           position = "activeSlide";
@@ -16,7 +15,7 @@ export function Slider({ people, index, setIndex }) {
         ) {
           position = "lastSlide";
         }
-        return <Card key={id} person={person} position={position} />;
+        return <Card key={person.id} person={person} position={position} />;
       })}
       <button className="prev" onClick={() => setIndex(index - 1)}>
         <FiChevronLeft />

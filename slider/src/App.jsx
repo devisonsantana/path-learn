@@ -3,17 +3,20 @@ import { Slider } from "./Slider";
 import data from "./data";
 
 export default function App() {
-  const [people, setPeople] = useState(data);
+  const [people] = useState(data);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const lastIndex = people.length - 1;
-    if (index < 0) {
-      setIndex(lastIndex);
-    }
-    if (index > lastIndex) {
-      setIndex(0);
-    }
+    const indexHandler = () => {
+      const lastIndex = people.length - 1;
+      if (index < 0) {
+        setIndex(lastIndex);
+      }
+      if (index > lastIndex) {
+        setIndex(0);
+      }
+    };
+    indexHandler();
   }, [index, people]);
 
   useEffect(() => {
