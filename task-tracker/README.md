@@ -21,7 +21,6 @@
 | --------------- | ----------- | ----------------- |
 | **Id**          | **INTEGER** | **`PRIMARY KEY`** |
 | **Title**       | **VARCHAR** | **NOT NULL**      |
-| **Description** | **TEXT**    | **NULL**          |
 | **Position**    | **INTEGER** | **NOT NULL**      |
 | **Done**        | **BIT**     | **NOT NULL**      |
 
