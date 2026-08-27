@@ -6,5 +6,5 @@ public interface ILogRepository
 {
     IEnumerable<LogModel> GetAll();
     IEnumerable<LogModel> GetByTaskId(int taskId);
-    int Insert(LogModel log);
+    void Insert(LogModel log);
 }

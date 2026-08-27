@@ -3,13 +3,25 @@ using TaskTracker.Repositories;
 
 namespace TaskTracker.Services;
 
-public class TaskService(ITaskRepository repository) : ITaskService
+public class TaskService(ITaskRepository repository, ILogService service) : ITaskService
 {
     private readonly ITaskRepository _repository = repository;
+    private readonly ILogService _logService = service;
 
     public TaskModel Add(string title)
     {
-        throw new NotImplementedException();
+        int newPosition = _repository.GetMaxPosition() + 1;
+        var task = new TaskModel
+        {
+            Title = title,
+            Position = newPosition,
+            Done = false
+        };
+        task.Id = _repository.Insert(task);
+
+        _logService.RegisterCreated(task.Id, title);
+
+        return task;
     }
 
     public bool Delete(int id)
@@ -22,11 +34,7 @@ public class TaskService(ITaskRepository repository) : ITaskService
         throw new NotImplementedException();
     }
 
-    public IEnumerable<TaskModel> GetAll()
-    {
-        var tasks = _repository.GetAll();
-        return tasks;
-    }
+    public IEnumerable<TaskModel> GetAll() => _repository.GetAll();
 
     public bool Move(int id, int newPosition)
     {

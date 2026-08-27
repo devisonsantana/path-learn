@@ -46,19 +46,76 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
         return tasks;
     }
 
-    public TaskModel? GetById(int id)
+    public TaskModel? GetById(int taskId)
     {
-        throw new NotImplementedException();
+        var select = _connection.CreateCommand();
+        select.CommandText = """
+            SELECT
+                Id,
+                Title,
+                Position,
+                Done
+            FROM Tasks
+            WHERE Id = @id;
+        """;
+        select.Parameters.AddWithValue("@id", taskId);
+
+        using var reader = select.ExecuteReader();
+        while (reader.Read())
+        {
+            int id = reader.GetInt32(0);
+            string title = reader.GetString(1);
+            int position = reader.GetInt32(2);
+            bool done = reader.GetBoolean(3);
+
+            return new TaskModel
+            {
+                Id = id,
+                Title = title,
+                Position = position,
+                Done = done
+            };
+        }
+        return null;
     }
 
     public int GetMaxPosition()
     {
-        throw new NotImplementedException();
+        var select = _connection.CreateCommand();
+        select.CommandText = """
+            SELECT MAX(Position) FROM Tasks;
+        """;
+        var result = select.ExecuteScalar();
+        return result is DBNull or null ? 0 : Convert.ToInt32(result);
     }
 
     public int Insert(TaskModel task)
     {
-        throw new NotImplementedException();
+        using var transaction = _connection.BeginTransaction();
+
+        var insert = _connection.CreateCommand();
+        insert.Transaction = transaction;
+        insert.CommandText = """
+            INSERT INTO Tasks
+                (Title, Position, Done)
+            VALUES
+                (@title, @position, @done);
+        """;
+        insert.Parameters.AddWithValue("@title", task.Title);
+        insert.Parameters.AddWithValue("@position", task.Position);
+        insert.Parameters.AddWithValue("@done", task.Done);
+
+        insert.ExecuteNonQuery();
+
+        var selectId = _connection.CreateCommand();
+        selectId.Transaction = transaction;
+        selectId.CommandText = "SELECT last_insert_rowid();";
+
+        var result = selectId.ExecuteScalar();
+
+        transaction.Commit();
+
+        return Convert.ToInt32(result);
     }
 
     public void Move(int id, int from, int to)

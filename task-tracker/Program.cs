@@ -15,8 +15,10 @@ public class Program
         connection.Open();
         connection.Migrate();
 
+        ILogRepository logRepository = new LogRepository(connection);
         ITaskRepository taskRepository = new TaskRepository(connection);
-        ITaskService taskService = new TaskService(taskRepository);
+        ILogService logService = new LogService(logRepository);
+        ITaskService taskService = new TaskService(taskRepository, logService);
 
         Console.WriteLine("Task Tracker - type 'help' to see the available commands.");
 
@@ -86,23 +88,22 @@ public class Program
     {
         var tasks = service.GetAll();
 
-        Console.WriteLine($"Total Tasks: {tasks.Count()}");
+        if (!tasks.Any())
+        {
+            Console.WriteLine("No tasks found. Use 'add <title>' to create one.");
+            return;
+        }
 
         foreach (var task in tasks)
         {
-            Console.WriteLine(
-            $"""
-            Id={task.Id}
-            Title={task.Title}
-            Position={task.Position}
-            Done={task.Done}
-            ======================================
-            """
-            );
+            string status = task.Done ? "[x]" : "[ ]";
+            Console.WriteLine($"{status} #{task.Id} (pos {task.Position}) {task.Title}");
         }
     }
     static void Add(ITaskService service, string title)
     {
+        var task = service.Add(title);
+        Console.WriteLine($"Task added: [ ] #{task.Id} {task.Title}");
     }
     static void Edit(ITaskService service, int id, string title)
     {
