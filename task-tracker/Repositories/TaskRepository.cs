@@ -123,8 +123,16 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
         throw new NotImplementedException();
     }
 
-    public void Update(TaskModel task)
+    public void UpdateTitle(int id, string title)
     {
-        throw new NotImplementedException();
+        var update = _connection.CreateCommand();
+        update.CommandText = """
+            UPDATE Tasks
+                SET Title = @title
+            WHERE Id = @id;
+        """;
+        update.Parameters.AddWithValue("@title", title);
+        update.Parameters.AddWithValue("@id", id);
+        update.ExecuteNonQuery();
     }
 }

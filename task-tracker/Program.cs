@@ -107,6 +107,12 @@ public class Program
     }
     static void Edit(ITaskService service, int id, string title)
     {
+        bool success = service.Edit(id, title);
+
+        if (success)
+            Console.WriteLine($"Task #{id} updated.");
+        else
+            Console.WriteLine($"Task #{id} not found.");
     }
     static void Delete(ITaskService service, int id)
     {

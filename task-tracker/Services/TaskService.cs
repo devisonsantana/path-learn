@@ -31,7 +31,15 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
 
     public bool Edit(int id, string title)
     {
-        throw new NotImplementedException();
+        var task = _repository.GetById(id);
+        if (task is null)
+            return false;
+
+        _repository.UpdateTitle(id, title);
+        
+        _logService.RegisterEdited(id, task.Title, title);
+
+        return true;
     }
 
     public IEnumerable<TaskModel> GetAll() => _repository.GetAll();

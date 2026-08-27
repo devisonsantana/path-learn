@@ -41,7 +41,14 @@ public class LogService(ILogRepository repository) : ILogService
 
     public void RegisterEdited(int taskId, string oldTitle, string newTitle)
     {
-        throw new NotImplementedException();
+        var log = new LogModel
+        {
+            TaskId = taskId,
+            ActionDescription = $"Title changed from '{oldTitle}' to '{newTitle}'",
+            ActionType = ActionType.Edited,
+            ActionTime = DateTime.Now
+        };
+        _repository.Insert(log);
     }
 
     public void RegisterMoved(int taskId, int oldPosition, int newPosition)
