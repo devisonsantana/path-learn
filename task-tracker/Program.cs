@@ -1,4 +1,6 @@
-﻿using TaskTracker.Repositories;
+﻿using Microsoft.Data.Sqlite;
+using TaskTracker.Extension;
+using TaskTracker.Repositories;
 using TaskTracker.Services;
 
 namespace TaskTracker;
@@ -8,7 +10,12 @@ public class Program
     static bool Running = true;
     public static void Main()
     {
-        ITaskRepository taskRepository = new TaskRepository();
+        using SqliteConnection connection = new("Data Source=Data/data.db");
+
+        connection.Open();
+        connection.Migrate();
+
+        ITaskRepository taskRepository = new TaskRepository(connection);
         ITaskService taskService = new TaskService(taskRepository);
 
         Console.WriteLine("Task Tracker - type 'help' to see the available commands.");
@@ -19,9 +26,7 @@ public class Program
             string? rawInput = Console.ReadLine()?.Trim();
 
             if (string.IsNullOrWhiteSpace(rawInput))
-            {
                 continue;
-            }
 
             string[] inputValues = rawInput.Split(' ', 2);
             string command = inputValues[0].ToLower();
@@ -79,6 +84,22 @@ public class Program
     }
     static void List(ITaskService service)
     {
+        var tasks = service.GetAll();
+
+        Console.WriteLine($"Total Tasks: {tasks.Count()}");
+
+        foreach (var task in tasks)
+        {
+            Console.WriteLine(
+            $"""
+            Id={task.Id}
+            Title={task.Title}
+            Position={task.Position}
+            Done={task.Done}
+            ======================================
+            """
+            );
+        }
     }
     static void Add(ITaskService service, string title)
     {
