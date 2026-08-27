@@ -11,7 +11,7 @@ public class Program
         ITaskRepository taskRepository = new TaskRepository();
         ITaskService taskService = new TaskService(taskRepository);
 
-        Console.WriteLine("[WELCOME MESSAGE]");
+        Console.WriteLine("Task Tracker - type 'help' to see the available commands.");
 
         while (Running)
         {
@@ -36,7 +36,7 @@ public class Program
                     if (!string.IsNullOrWhiteSpace(options))
                         Add(taskService, options.Trim());
                     else
-                        Console.WriteLine("Argumment is missing to add command");
+                        Console.WriteLine("Missing argument. Usage: add <title>");
                     break;
                 case "edit":
                     if (!string.IsNullOrWhiteSpace(options))
@@ -48,11 +48,11 @@ public class Program
                             if (int.TryParse(args[0], out int id))
                                 Edit(taskService, id, title);
                             else
-                                Console.WriteLine("Provide a valid number for id argumment");
+                                Console.WriteLine("Invalid id. Usage: edit <id> <title>");
                             break;
                         }
                     }
-                    Console.WriteLine("Argumment is missing to edit command");
+                    Console.WriteLine("Missing argument. Usage: edit <id> <title>");
                     break;
                 case "del":
                     if (!string.IsNullOrWhiteSpace(options))
@@ -60,7 +60,7 @@ public class Program
                         if (int.TryParse(options.Trim(), out int id))
                             Delete(taskService, id);
                         else
-                            Console.WriteLine("Provide a valid number for id argumment");
+                            Console.WriteLine("Invalid id. Usage: del <id>");
                         break;
                     }
                     Console.WriteLine("Argumment is missing to del command");
@@ -72,7 +72,7 @@ public class Program
                     Exit();
                     break;
                 default:
-                    Console.WriteLine($"Error: Command {command} not found...");
+                    Console.WriteLine($"Unknown command: '{command}'. Type 'help' to see the available commands.");
                     break;
             }
         }
@@ -93,21 +93,21 @@ public class Program
     {
         Console.WriteLine(
         """
-        [COMMAND HEADER]
+        Available commands:
 
-        [COMMAND]        [ARGUMENTS]        [DESCRITPION]
-        list
-        add
-        edit
-        del
-        help
-        exit
+        COMMAND    ARGUMENTS       DESCRIPTION
+        list                       List all tasks
+        add        <title>         Add a new task
+        edit       <id> <title>    Edit the title of an existing task
+        del        <id>            Delete a task
+        help                       Show this list of commands
+        exit                       Exit the application
         """
         );
     }
     static void Exit()
     {
-        Console.WriteLine("Bye...");
+        Console.WriteLine("Bye!");
         Running = false;
     }
 }
