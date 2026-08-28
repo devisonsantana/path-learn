@@ -28,8 +28,7 @@ public static class SqliteExtensions
                 TaskId INTEGER NOT NULL,
                 ActionDescription VARCHAR(255) NOT NULL,
                 ActionType INTEGER NOT NULL,
-                ActionTime DATETIME NOT NULL,
-                FOREIGN KEY (TaskId) REFERENCES Tasks(Id)
+                ActionTime DATETIME NOT NULL
             );
         """;
         createLogsIfNotExists.ExecuteNonQuery();

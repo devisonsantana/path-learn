@@ -61,6 +61,32 @@ public class Program
                     }
                     Console.WriteLine("Missing argument. Usage: edit <id> <title>");
                     break;
+                case "done":
+                    if (!string.IsNullOrWhiteSpace(options))
+                    {
+                        if (int.TryParse(options.Trim(), out int id))
+                            Done(taskService, id);
+                        else
+                            Console.WriteLine("Invalid id. Usage: done <id>");
+                        break;
+                    }
+                    Console.WriteLine("Missing argument. Usage: done <id>");
+                    break;
+                case "mv":
+                    if (!string.IsNullOrWhiteSpace(options))
+                    {
+                        string[] args = options.Trim().Split(' ', 2);
+                        if (args.Length > 1)
+                        {
+                            if (int.TryParse(args[0], out int id) && int.TryParse(args[1], out int newPosition))
+                                Move(taskService, id, newPosition);
+                            else
+                                Console.WriteLine("Invalid id. Usage: mv <id> <position>");
+                            break;
+                        }
+                    }
+                    Console.WriteLine("Missing argument. Usage: mv <id> <position>");
+                    break;
                 case "del":
                     if (!string.IsNullOrWhiteSpace(options))
                     {
@@ -70,7 +96,18 @@ public class Program
                             Console.WriteLine("Invalid id. Usage: del <id>");
                         break;
                     }
-                    Console.WriteLine("Argumment is missing to del command");
+                    Console.WriteLine("Missing argument. Usage: del <id>");
+                    break;
+                case "logs":
+                    if (!string.IsNullOrWhiteSpace(options))
+                    {
+                        if (int.TryParse(options.Trim(), out int id))
+                            Logs(logService, id);
+                        else
+                            Console.WriteLine("Invalid id. Usage: logs <id>");
+                        break;
+                    }
+                    Logs(logService);
                     break;
                 case "help":
                     Help();
@@ -114,8 +151,60 @@ public class Program
         else
             Console.WriteLine($"Task #{id} not found.");
     }
+    static void Done(ITaskService service, int id)
+    {
+        bool success = service.ToggleDone(id);
+
+        if (success)
+            Console.WriteLine($"Task #{id} status toggled.");
+        else
+            Console.WriteLine($"Task #{id} not found.");
+    }
+    static void Move(ITaskService service, int id, int newPosition)
+    {
+        bool success = service.Move(id, newPosition);
+
+        if (success)
+            Console.WriteLine($"Task #{id} moved.");
+        else
+            Console.WriteLine($"Task #{id} not found.");
+
+    }
     static void Delete(ITaskService service, int id)
     {
+        bool success = service.Delete(id);
+
+        if (success)
+            Console.WriteLine($"Task #{id} deleted.");
+        else
+            Console.WriteLine($"Task #{id} not found.");
+    }
+    static void Logs(ILogService service)
+    {
+        var logs = service.GetHistory();
+
+        if (!logs.Any())
+        {
+            Console.WriteLine("No logs found.");
+            return;
+        }
+
+        foreach (var log in logs)
+            Console.WriteLine($"#{log.TaskId} | {log.ActionDescription} | {log.ActionType} | {log.ActionTime}");
+    }
+    static void Logs(ILogService service, int id)
+    {
+        var logs = service.GetHistory(id);
+
+        if (!logs.Any())
+        {
+            Console.WriteLine("No logs found.");
+            return;
+        }
+
+        Console.WriteLine($"Showing {logs.Count()} log(s) for task #{id}.");
+        foreach (var log in logs)
+            Console.WriteLine($"#{log.TaskId} | {log.ActionDescription} | {log.ActionType} | {log.ActionTime}");
     }
     static void Help()
     {
@@ -127,7 +216,10 @@ public class Program
         list                       List all tasks
         add        <title>         Add a new task
         edit       <id> <title>    Edit the title of an existing task
+        done       <id>            Mark/unmark a task as done
+        mv         <id> <pos>      Move a task to a new position
         del        <id>            Delete a task
+        logs       [id]            Show history (all tasks, or a specific task)
         help                       Show this list of commands
         exit                       Exit the application
         """

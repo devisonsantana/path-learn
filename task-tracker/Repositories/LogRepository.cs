@@ -9,12 +9,78 @@ public class LogRepository(SqliteConnection connection) : ILogRepository
 
     public IEnumerable<LogModel> GetAll()
     {
-        throw new NotImplementedException();
+        var logs = new List<LogModel>();
+
+        var select = _connection.CreateCommand();
+        select.CommandText = """
+            SELECT
+                Id,
+                TaskId,
+                ActionDescription,
+                ActionType,
+                ActionTime
+            FROM Logs;
+        """;
+
+        using var reader = select.ExecuteReader();
+        while (reader.Read())
+        {
+            int id = reader.GetInt32(0);
+            int taskId = reader.GetInt32(1);
+            string actionDescription = reader.GetString(2);
+            ActionType actionType = (ActionType)reader.GetInt32(3);
+            DateTime actionTime = reader.GetDateTime(4);
+
+            var log = new LogModel
+            {
+                Id = id,
+                TaskId = taskId,
+                ActionDescription = actionDescription,
+                ActionType = actionType,
+                ActionTime = actionTime
+            };
+            logs.Add(log);
+        }
+        return logs;
     }
 
     public IEnumerable<LogModel> GetByTaskId(int taskId)
     {
-        throw new NotImplementedException();
+        var logs = new List<LogModel>();
+
+        var select = _connection.CreateCommand();
+        select.CommandText = """
+            SELECT
+                Id,
+                TaskId,
+                ActionDescription,
+                ActionType,
+                ActionTime
+            FROM Logs
+            WHERE TaskId = @taskId;
+        """;
+        select.Parameters.AddWithValue("@taskId", taskId);
+
+        using var reader = select.ExecuteReader();
+        while (reader.Read())
+        {
+            int id = reader.GetInt32(0);
+            int taskIdDb = reader.GetInt32(1);
+            string actionDescription = reader.GetString(2);
+            ActionType actionType = (ActionType)reader.GetInt32(3);
+            DateTime actionTime = reader.GetDateTime(4);
+
+            var log = new LogModel
+            {
+                Id = id,
+                TaskId = taskIdDb,
+                ActionDescription = actionDescription,
+                ActionType = actionType,
+                ActionTime = actionTime
+            };
+            logs.Add(log);
+        }
+        return logs;
     }
 
     public void Insert(LogModel log)

@@ -17,8 +17,8 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
             Position = newPosition,
             Done = false
         };
-        task.Id = _repository.Insert(task);
 
+        task.Id = _repository.Insert(task);
         _logService.RegisterCreated(task.Id, title);
 
         return task;
@@ -26,18 +26,27 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
 
     public bool Delete(int id)
     {
-        throw new NotImplementedException();
+        var task = _repository.GetById(id);
+        if (task is null)
+            return false;
+
+        _repository.Delete(task);
+        _logService.RegisterDeleted(task.Id, task.Title);
+
+        return true;
     }
 
-    public bool Edit(int id, string title)
+    public bool Edit(int id, string newTitle)
     {
         var task = _repository.GetById(id);
         if (task is null)
             return false;
 
-        _repository.UpdateTitle(id, title);
-        
-        _logService.RegisterEdited(id, task.Title, title);
+        string oldTitle = task.Title;
+        task.Title = newTitle;
+
+        _repository.Update(task);
+        _logService.RegisterEdited(id, oldTitle, newTitle);
 
         return true;
     }
@@ -46,11 +55,33 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
 
     public bool Move(int id, int newPosition)
     {
-        throw new NotImplementedException();
+        var task = _repository.GetById(id);
+        if (task is null)
+            return false;
+
+        int count = GetAll().Count();
+        newPosition = newPosition < 1 ? 1 : newPosition > count ? count : newPosition;
+
+        if (task.Position == newPosition)
+            return true;
+
+        _repository.Move(task.Id, task.Position, newPosition);
+        _logService.RegisterMoved(task.Id, task.Position, newPosition);
+
+        return true;
     }
 
     public bool ToggleDone(int id)
     {
-        throw new NotImplementedException();
+        var task = _repository.GetById(id);
+        if (task is null)
+            return false;
+
+        task.Done = !task.Done;
+
+        _repository.Update(task);
+        _logService.RegisterDone(task.Id, task.Done);
+
+        return true;
     }
 }

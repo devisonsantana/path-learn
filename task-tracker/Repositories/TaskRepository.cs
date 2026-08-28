@@ -9,7 +9,29 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
 
     public void Delete(TaskModel task)
     {
-        throw new NotImplementedException();
+        using var transaction = _connection.BeginTransaction();
+
+        var delete = _connection.CreateCommand();
+        delete.Transaction = transaction;
+        delete.CommandText = """
+            DELETE FROM Tasks WHERE Id = @id;
+        """;
+        delete.Parameters.AddWithValue("@id", task.Id);
+
+        delete.ExecuteNonQuery();
+
+        var updatePositions = _connection.CreateCommand();
+        updatePositions.Transaction = transaction;
+        updatePositions.CommandText = """
+            UPDATE Tasks
+                SET Position = Position - 1
+            WHERE Position > @position;
+        """;
+        updatePositions.Parameters.AddWithValue("@position", task.Position);
+
+        updatePositions.ExecuteNonQuery();
+
+        transaction.Commit();
     }
 
     public IEnumerable<TaskModel> GetAll()
@@ -26,7 +48,9 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
             FROM Tasks
                 ORDER BY Position ASC;
         """;
+
         using var reader = select.ExecuteReader();
+
         while (reader.Read())
         {
             int id = reader.GetInt32(0);
@@ -61,6 +85,7 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
         select.Parameters.AddWithValue("@id", taskId);
 
         using var reader = select.ExecuteReader();
+
         while (reader.Read())
         {
             int id = reader.GetInt32(0);
@@ -85,7 +110,9 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
         select.CommandText = """
             SELECT MAX(Position) FROM Tasks;
         """;
+
         var result = select.ExecuteScalar();
+
         return result is DBNull or null ? 0 : Convert.ToInt32(result);
     }
 
@@ -120,19 +147,54 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
 
     public void Move(int id, int from, int to)
     {
-        throw new NotImplementedException();
+        using var transaction = _connection.BeginTransaction();
+
+        var update = _connection.CreateCommand();
+        update.Transaction = transaction;
+
+        if (from < to)
+            update.CommandText = """
+                UPDATE Tasks
+                    SET Position = Position - 1
+                WHERE Position > @from AND Position <= @to;
+            """;
+        else
+            update.CommandText = """
+                UPDATE Tasks
+                    SET Position = Position + 1
+                WHERE Position < @from AND Position >= @to;
+            """;
+        update.Parameters.AddWithValue("@from", from);
+        update.Parameters.AddWithValue("@to", to);
+
+        update.ExecuteNonQuery();
+
+        var moveTask = _connection.CreateCommand();
+        moveTask.Transaction = transaction;
+
+        moveTask.CommandText = "UPDATE Tasks SET Position = @to WHERE Id = @id;";
+        moveTask.Parameters.AddWithValue("@to", to);
+        moveTask.Parameters.AddWithValue("@id", id);
+
+        moveTask.ExecuteNonQuery();
+
+        transaction.Commit();
     }
 
-    public void UpdateTitle(int id, string title)
+    public void Update(TaskModel task)
     {
         var update = _connection.CreateCommand();
         update.CommandText = """
             UPDATE Tasks
-                SET Title = @title
+                SET
+                    Title = @title,
+                    Done = @done
             WHERE Id = @id;
         """;
-        update.Parameters.AddWithValue("@title", title);
-        update.Parameters.AddWithValue("@id", id);
+        update.Parameters.AddWithValue("@title", task.Title);
+        update.Parameters.AddWithValue("@done", task.Done);
+        update.Parameters.AddWithValue("@id", task.Id);
+
         update.ExecuteNonQuery();
     }
 }

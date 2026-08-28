@@ -8,7 +8,7 @@ public interface ITaskRepository
     TaskModel? GetById(int id);
     int GetMaxPosition();
     int Insert(TaskModel task);
-    void UpdateTitle(int id, string title);
+    void Update(TaskModel task);
     void Delete(TaskModel task);
     void Move(int id, int from, int to);
 }
