@@ -53,22 +53,22 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
 
     public IEnumerable<TaskModel> GetAll() => _repository.GetAll();
 
-    public bool Move(int id, int newPosition)
+    public int Move(int id, int newPosition)
     {
         var task = _repository.GetById(id);
         if (task is null)
-            return false;
+            return -1;
 
         int count = GetAll().Count();
         newPosition = newPosition < 1 ? 1 : newPosition > count ? count : newPosition;
 
         if (task.Position == newPosition)
-            return true;
+            return 0;
 
         _repository.Move(task.Id, task.Position, newPosition);
         _logService.RegisterMoved(task.Id, task.Position, newPosition);
 
-        return true;
+        return 1;
     }
 
     public bool ToggleDone(int id)

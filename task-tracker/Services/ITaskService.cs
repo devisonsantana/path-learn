@@ -8,6 +8,6 @@ public interface ITaskService
     TaskModel Add(string title);
     bool Edit(int id, string title);
     bool Delete(int id);
-    bool Move(int id, int newPosition);
+    int Move(int id, int newPosition);
     bool ToggleDone(int id);
 }

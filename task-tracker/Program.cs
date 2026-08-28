@@ -162,10 +162,12 @@ public class Program
     }
     static void Move(ITaskService service, int id, int newPosition)
     {
-        bool success = service.Move(id, newPosition);
+        int success = service.Move(id, newPosition);
 
-        if (success)
+        if (success == 1)
             Console.WriteLine($"Task #{id} moved.");
+        else if (success == 0)
+            Console.WriteLine($"Task #{id} not modified.");
         else
             Console.WriteLine($"Task #{id} not found.");
 
