@@ -8,6 +8,8 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
     private readonly ITaskRepository _repository = repository;
     private readonly ILogService _logService = service;
 
+    public IEnumerable<TaskModel> GetAll() => _repository.GetAll();
+
     public TaskModel Add(string title)
     {
         int newPosition = _repository.GetMaxPosition() + 1;
@@ -22,18 +24,6 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
         _logService.RegisterCreated(task.Id, title);
 
         return task;
-    }
-
-    public bool Delete(int id)
-    {
-        var task = _repository.GetById(id);
-        if (task is null)
-            return false;
-
-        _repository.Delete(task);
-        _logService.RegisterDeleted(task.Id, task.Title);
-
-        return true;
     }
 
     public bool Edit(int id, string newTitle)
@@ -51,7 +41,17 @@ public class TaskService(ITaskRepository repository, ILogService service) : ITas
         return true;
     }
 
-    public IEnumerable<TaskModel> GetAll() => _repository.GetAll();
+    public bool Delete(int id)
+    {
+        var task = _repository.GetById(id);
+        if (task is null)
+            return false;
+
+        _repository.Delete(task);
+        _logService.RegisterDeleted(task.Id, task.Title);
+
+        return true;
+    }
 
     public int Move(int id, int newPosition)
     {

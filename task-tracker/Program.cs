@@ -121,6 +121,7 @@ public class Program
             }
         }
     }
+
     static void List(ITaskService service)
     {
         var tasks = service.GetAll();
@@ -137,11 +138,13 @@ public class Program
             Console.WriteLine($"{status} #{task.Id} (pos {task.Position}) {task.Title}");
         }
     }
+
     static void Add(ITaskService service, string title)
     {
         var task = service.Add(title);
         Console.WriteLine($"Task added: [ ] #{task.Id} {task.Title}");
     }
+
     static void Edit(ITaskService service, int id, string title)
     {
         bool success = service.Edit(id, title);
@@ -151,6 +154,7 @@ public class Program
         else
             Console.WriteLine($"Task #{id} not found.");
     }
+
     static void Done(ITaskService service, int id)
     {
         bool success = service.ToggleDone(id);
@@ -160,6 +164,7 @@ public class Program
         else
             Console.WriteLine($"Task #{id} not found.");
     }
+
     static void Move(ITaskService service, int id, int newPosition)
     {
         int success = service.Move(id, newPosition);
@@ -172,6 +177,7 @@ public class Program
             Console.WriteLine($"Task #{id} not found.");
 
     }
+
     static void Delete(ITaskService service, int id)
     {
         bool success = service.Delete(id);
@@ -181,6 +187,7 @@ public class Program
         else
             Console.WriteLine($"Task #{id} not found.");
     }
+
     static void Logs(ILogService service)
     {
         var logs = service.GetHistory();
@@ -194,6 +201,7 @@ public class Program
         foreach (var log in logs)
             Console.WriteLine($"#{log.TaskId} | {log.ActionDescription} | {log.ActionType} | {log.ActionTime}");
     }
+
     static void Logs(ILogService service, int id)
     {
         var logs = service.GetHistory(id);
@@ -208,6 +216,7 @@ public class Program
         foreach (var log in logs)
             Console.WriteLine($"#{log.TaskId} | {log.ActionDescription} | {log.ActionType} | {log.ActionTime}");
     }
+
     static void Help()
     {
         Console.WriteLine(
@@ -227,6 +236,7 @@ public class Program
         """
         );
     }
+
     static void Exit()
     {
         Console.WriteLine("Bye!");

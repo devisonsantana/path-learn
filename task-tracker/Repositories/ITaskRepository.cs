@@ -9,6 +9,6 @@ public interface ITaskRepository
     int GetMaxPosition();
     int Insert(TaskModel task);
     void Update(TaskModel task);
-    void Delete(TaskModel task);
     void Move(int id, int from, int to);
+    void Delete(TaskModel task);
 }

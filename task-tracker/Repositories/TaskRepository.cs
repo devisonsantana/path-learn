@@ -7,33 +7,6 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
 {
     private readonly SqliteConnection _connection = connection;
 
-    public void Delete(TaskModel task)
-    {
-        using var transaction = _connection.BeginTransaction();
-
-        var delete = _connection.CreateCommand();
-        delete.Transaction = transaction;
-        delete.CommandText = """
-            DELETE FROM Tasks WHERE Id = @id;
-        """;
-        delete.Parameters.AddWithValue("@id", task.Id);
-
-        delete.ExecuteNonQuery();
-
-        var updatePositions = _connection.CreateCommand();
-        updatePositions.Transaction = transaction;
-        updatePositions.CommandText = """
-            UPDATE Tasks
-                SET Position = Position - 1
-            WHERE Position > @position;
-        """;
-        updatePositions.Parameters.AddWithValue("@position", task.Position);
-
-        updatePositions.ExecuteNonQuery();
-
-        transaction.Commit();
-    }
-
     public IEnumerable<TaskModel> GetAll()
     {
         var tasks = new List<TaskModel>();
@@ -145,6 +118,23 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
         return Convert.ToInt32(result);
     }
 
+    public void Update(TaskModel task)
+    {
+        var update = _connection.CreateCommand();
+        update.CommandText = """
+            UPDATE Tasks
+                SET
+                    Title = @title,
+                    Done = @done
+            WHERE Id = @id;
+        """;
+        update.Parameters.AddWithValue("@title", task.Title);
+        update.Parameters.AddWithValue("@done", task.Done);
+        update.Parameters.AddWithValue("@id", task.Id);
+
+        update.ExecuteNonQuery();
+    }
+
     public void Move(int id, int from, int to)
     {
         using var transaction = _connection.BeginTransaction();
@@ -181,20 +171,30 @@ public class TaskRepository(SqliteConnection connection) : ITaskRepository
         transaction.Commit();
     }
 
-    public void Update(TaskModel task)
+    public void Delete(TaskModel task)
     {
-        var update = _connection.CreateCommand();
-        update.CommandText = """
-            UPDATE Tasks
-                SET
-                    Title = @title,
-                    Done = @done
-            WHERE Id = @id;
-        """;
-        update.Parameters.AddWithValue("@title", task.Title);
-        update.Parameters.AddWithValue("@done", task.Done);
-        update.Parameters.AddWithValue("@id", task.Id);
+        using var transaction = _connection.BeginTransaction();
 
-        update.ExecuteNonQuery();
+        var delete = _connection.CreateCommand();
+        delete.Transaction = transaction;
+        delete.CommandText = """
+            DELETE FROM Tasks WHERE Id = @id;
+        """;
+        delete.Parameters.AddWithValue("@id", task.Id);
+
+        delete.ExecuteNonQuery();
+
+        var updatePositions = _connection.CreateCommand();
+        updatePositions.Transaction = transaction;
+        updatePositions.CommandText = """
+            UPDATE Tasks
+                SET Position = Position - 1
+            WHERE Position > @position;
+        """;
+        updatePositions.Parameters.AddWithValue("@position", task.Position);
+
+        updatePositions.ExecuteNonQuery();
+
+        transaction.Commit();
     }
 }
