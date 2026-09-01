@@ -10,11 +10,13 @@ export const AddTransaction = () => {
     e.preventDefault();
     if (!text || !amount) return;
     const transaction = {
-      id: Math.floor(Math.random() * 100000),
+      id: crypto.randomUUID(),
       text,
       amount: +amount,
     };
     addTransaction(transaction);
+    setText("");
+    setAmount(0);
   };
 
   return (
