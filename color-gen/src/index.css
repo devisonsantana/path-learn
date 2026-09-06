@@ -159,6 +159,7 @@ input {
   font-size: 1.2rem;
   border-top-left-radius: var(--radius);
   border-bottom-left-radius: var(--radius);
+  outline: none;
 }
 .btn {
   background: var(--clr-primary-5);
