@@ -191,8 +191,8 @@ input.error {
   grid-template-rows: repeat(auto-fit, minmax(96px, 1fr));
 }
 .color {
+  position: relative;
   padding: 1rem 2rem;
-  cursor: pointer;
   font-size: 1rem;
   text-transform: none;
 }
@@ -209,6 +209,15 @@ input.error {
 }
 .color-light .percent-value {
   color: var(--clr-white);
+}
+.copy-icon {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  cursor: pointer;
+}
+.copy-icon:hover {
+  filter: brightness(2);
 }
 
 .alert {
