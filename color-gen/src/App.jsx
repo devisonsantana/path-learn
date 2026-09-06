@@ -3,9 +3,10 @@ import Values from "values.js";
 import { SingleColor } from "./SingleColor";
 
 export default function App() {
+  const initialValues = new Values("#3ae6cc").all(10);
   const [color, setColor] = useState("");
   const [error, setError] = useState(false);
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(initialValues);
 
   const handleSubmit = (e) => {
     e.preventDefault();
