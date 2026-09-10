@@ -1,6 +1,6 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-function List() {
+function List({ items }) {
   return <div>List</div>;
 }
 

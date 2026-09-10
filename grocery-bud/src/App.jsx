@@ -11,6 +11,19 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!name) {
+      //display alert
+    } else if (name && isEditing) {
+      // deal with editing
+    } else {
+      // show alert
+      const newItem = {
+        id: crypto.randomUUID(),
+        title: name,
+      };
+      setList([...list, newItem]);
+      setName("");
+    }
   };
 
   return (
@@ -32,7 +45,7 @@ function App() {
             </button>
           </div>
         </form>
-        <List />
+        <List items={list} />
         <button className="clear-btn">clear items</button>
       </div>
     </section>
