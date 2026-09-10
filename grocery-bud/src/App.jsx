@@ -22,6 +22,7 @@ function App() {
       // deal with editing
     } else {
       // show alert
+      showAlert(true, "item added to the list", "success");
       const newItem = {
         id: crypto.randomUUID(),
         title: name,
@@ -33,6 +34,10 @@ function App() {
 
   const showAlert = (show = false, msg = "", type = "") => {
     setAlert({ show, msg, type });
+  };
+  const clearList = () => {
+    showAlert(true, "empty list", "danger");
+    setList([]);
   };
 
   return (
@@ -56,7 +61,9 @@ function App() {
       {list.length > 0 && (
         <div className="grocery-container">
           <List items={list} />
-          <button className="clear-btn">clear items</button>
+          <button className="clear-btn" onClick={clearList}>
+            clear items
+          </button>
         </div>
       )}
     </section>
