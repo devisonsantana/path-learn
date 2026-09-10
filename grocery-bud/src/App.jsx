@@ -2,9 +2,18 @@ import { useState, useEffect } from "react";
 import Alert from "./Alert";
 import List from "./List";
 
+const getLocalStorage = () => {
+  let list = localStorage.getItem("list");
+  if (list) {
+    return JSON.parse(list);
+  } else {
+    return [];
+  }
+};
+
 function App() {
   const [name, setName] = useState("");
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(getLocalStorage());
   const [isEditing, setIsEditing] = useState(false);
   const [editID, setEditID] = useState(null);
   const [alert, setAlert] = useState({
@@ -16,7 +25,6 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name) {
-      //display alert
       showAlert(true, "please enter value", "danger");
     } else if (name && isEditing) {
       const updatedList = list.map((item) =>
@@ -28,7 +36,6 @@ function App() {
       setName("");
       setList(updatedList);
     } else {
-      // show alert
       showAlert(true, "item added to the list", "success");
       const newItem = {
         id: crypto.randomUUID(),
@@ -58,6 +65,9 @@ function App() {
     setList([]);
   };
 
+  useEffect(() => {
+    localStorage.setItem("list", JSON.stringify(list));
+  }, [list]);
   return (
     <section className="section-center">
       <form className="grocery-form" onSubmit={handleSubmit}>
