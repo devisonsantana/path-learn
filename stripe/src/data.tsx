@@ -26,3 +26,12 @@ export default [
     ],
   },
 ];
+
+export type SublinksType = {
+  page: string;
+  links: {
+    label: string;
+    icon: React.JSX.Element;
+    url: string;
+  }[];
+};
